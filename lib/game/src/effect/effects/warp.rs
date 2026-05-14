@@ -1,6 +1,4 @@
 //! EF_WARP — yellow shockwave ring portal. Reference: original game
-//! `RagEffect.cpp::Warp()` line 7717, `RagEffectPrim.cpp::Render3DCircle()`
-//! line 2757.
 //!
 //! Behaviour mirrors `CRagEffect::Warp()`:
 //!   * the parent emits one `PP_3DCIRCLE` every 20 frames while it lives
@@ -119,7 +117,7 @@ impl WarpEffect {
 
 impl Effect for WarpEffect {
     fn update(&mut self, ctx: &EffectUpdateCtx) -> EffectStatus {
-        let dt = ctx.dt;
+        let dt = ctx.delta;
         self.parent_age += dt;
         for ring in &mut self.rings {
             ring.age += dt;
@@ -188,7 +186,7 @@ mod tests {
     }
 
     fn step(effect: &mut WarpEffect, dt: f32) {
-        effect.update(&EffectUpdateCtx { dt });
+        effect.update(&EffectUpdateCtx { delta: dt });
     }
 
     #[test]
