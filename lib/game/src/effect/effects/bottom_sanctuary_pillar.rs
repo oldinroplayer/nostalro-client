@@ -44,14 +44,14 @@ const FADE_IN_FRAMES: f32 = 15.0;
 /// every ~120 frames ≈ 2 s of wall-clock spin).
 const ROT_DEG_PER_FRAME: f32 = 3.0;
 
-pub struct BottomSancEffect {
+pub struct BottomSanctuaryPillarEffect {
     world_pos: [f32; 3],
     age: f32,
     /// Random initial Y rotation, in radians. Stays constant per instance.
     initial_rotation: f32,
 }
 
-impl BottomSancEffect {
+impl BottomSanctuaryPillarEffect {
     pub fn new(attach: Attach) -> Self {
         let world_pos = match attach {
             Attach::WorldPos(p) => p,
@@ -70,7 +70,7 @@ impl BottomSancEffect {
     }
 }
 
-impl Effect for BottomSancEffect {
+impl Effect for BottomSanctuaryPillarEffect {
     fn update(&mut self, ctx: &EffectUpdateCtx) -> EffectStatus {
         self.age += ctx.dt;
         let total_s = TOTAL_DURATION_MS as f32 / 1000.0;
@@ -119,19 +119,19 @@ mod tests {
         }
     }
 
-    fn draws(effect: &BottomSancEffect) -> Vec<EffectPrimitiveDraw> {
+    fn draws(effect: &BottomSanctuaryPillarEffect) -> Vec<EffectPrimitiveDraw> {
         let mut list = EffectDrawList::new();
         effect.collect_draws(&mut list, &render_ctx());
         list.primitives
     }
 
-    fn step(effect: &mut BottomSancEffect, dt: f32) {
+    fn step(effect: &mut BottomSanctuaryPillarEffect, dt: f32) {
         effect.update(&EffectUpdateCtx { dt });
     }
 
     #[test]
     fn emits_a_square_frustum() {
-        let mut bs = BottomSancEffect::new(Attach::WorldPos([0.0; 3]));
+        let mut bs = BottomSanctuaryPillarEffect::new(Attach::WorldPos([0.0; 3]));
         step(&mut bs, 0.0);
         match &draws(&bs)[0] {
             EffectPrimitiveDraw::Frustum {
@@ -151,7 +151,7 @@ mod tests {
 
     #[test]
     fn rotation_advances_over_time() {
-        let mut bs = BottomSancEffect::new(Attach::WorldPos([0.0; 3]));
+        let mut bs = BottomSanctuaryPillarEffect::new(Attach::WorldPos([0.0; 3]));
         step(&mut bs, 0.0);
         let r0 = match &draws(&bs)[0] {
             EffectPrimitiveDraw::Frustum { rotation, .. } => *rotation,
@@ -167,7 +167,7 @@ mod tests {
 
     #[test]
     fn alpha_ramps_in_then_holds() {
-        let mut bs = BottomSancEffect::new(Attach::WorldPos([0.0; 3]));
+        let mut bs = BottomSanctuaryPillarEffect::new(Attach::WorldPos([0.0; 3]));
         step(&mut bs, 0.0);
         let a0 = match &draws(&bs)[0] {
             EffectPrimitiveDraw::Frustum { color, .. } => color[3],
@@ -184,7 +184,7 @@ mod tests {
 
     #[test]
     fn runs_for_full_duration() {
-        let mut bs = BottomSancEffect::new(Attach::WorldPos([0.0; 3]));
+        let mut bs = BottomSanctuaryPillarEffect::new(Attach::WorldPos([0.0; 3]));
         let s = bs.update(&EffectUpdateCtx { dt: 1.0 });
         assert!(matches!(s, EffectStatus::Running));
     }
