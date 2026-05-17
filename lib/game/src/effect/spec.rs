@@ -27,13 +27,16 @@ pub enum EffectSpec {
     /// scale); `anim_speed` matches `m_animSpeed` (motion advances every N
     /// ticks at 60 fps, so 2.0 = animation runs half-speed); `repeat` mirrors
     /// `m_repeatAnim` — when `false` the renderer clamps to the last motion
-    /// rather than looping.
+    /// rather than looping; `tint` is an RGBA multiplier (`[1.0; 4]` = no
+    /// tint, matches `PT_USEORGARGB`). DarkBreath uses `[1.0, 0.0, 0.0, 1.0]`
+    /// because dhxj zeroes `m_green` / `m_blue`.
     Spr {
         sprite: &'static str,
         duration_ms: u32,
         size_scale: f32,
         anim_speed: f32,
         repeat: bool,
+        tint: [f32; 4],
     },
     /// Burst of N animated SPR particles drifting along the Y axis with a
     /// fade-out tail. Used for chimney smoke, firefly puffs, and the rest of

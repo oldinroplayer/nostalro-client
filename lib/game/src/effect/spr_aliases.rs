@@ -12,10 +12,11 @@ use models::enums::effect_id::EffectId;
 
 /// Per-id SPR billboard parameters lifted from the original game.
 ///
-/// The original game's `RagEffectPrim` constructor sets `m_animSpeed = 4`
-/// and `m_repeatAnim = true` by default. Effects that never call the
-/// corresponding setter inherit those defaults, so [`SprDef::new`] mirrors
-/// them. Callers override only what the effect's recipe actually changes.
+/// The original game's `RagEffectPrim` constructor sets `m_animSpeed = 4`,
+/// `m_repeatAnim = true`, and `m_red = m_green = m_blue = 255` by default.
+/// Effects that never call the corresponding setter inherit those defaults,
+/// so [`SprDef::new`] mirrors them. Callers override only what the effect's
+/// recipe actually changes.
 #[derive(Clone, Copy, Debug)]
 pub struct SprDef {
     pub sprite: &'static str,
@@ -25,6 +26,10 @@ pub struct SprDef {
     /// `false` = play once and hold the final motion until the effect's
     /// duration_ms expires.
     pub repeat: bool,
+    /// RGBA multiplier applied per-pixel. `[1.0; 4]` = no tint (equivalent
+    /// to dhxj's `PT_USEORGARGB`). Effects that zero a channel — e.g.
+    /// DarkBreath setting `m_green = m_blue = 0` — populate this.
+    pub tint: [f32; 4],
 }
 
 impl SprDef {
@@ -34,6 +39,7 @@ impl SprDef {
             size_scale: 1.0,
             anim_speed: 4.0,
             repeat: true,
+            tint: [1.0, 1.0, 1.0, 1.0],
         }
     }
     const fn with_size(mut self, size_scale: f32) -> Self {
@@ -46,6 +52,10 @@ impl SprDef {
     }
     const fn one_shot(mut self) -> Self {
         self.repeat = false;
+        self
+    }
+    const fn with_tint(mut self, tint: [f32; 4]) -> Self {
+        self.tint = tint;
         self
     }
 }
@@ -80,6 +90,15 @@ pub fn spr_def(id: EffectId) -> Option<SprDef> {
             .with_size(1.5)
             .with_anim_speed(2.0)
             .one_shot(),
+        // DarkBreath: dhxj zeroes m_green / m_blue so the sprite renders
+        // pure red. m_size=0.8, animSpeed=1, m_duration=65 (overrides the
+        // table value of 500). Fade-out from frame 60 isn't reproduced yet
+        // — the renderer holds full alpha until the holder kills the
+        // effect at duration.
+        EffectId::Darkbreath => SprDef::new("data/sprite/이팩트/darkbreath")
+            .with_size(0.8)
+            .with_anim_speed(1.0)
+            .with_tint([1.0, 0.0, 0.0, 1.0]),
         _ => return None,
     })
 }
