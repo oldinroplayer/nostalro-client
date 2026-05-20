@@ -388,7 +388,9 @@ fn default_duration_ms(id: EffectId) -> u32 {
         EffectId::Blessing => 1500,
         EffectId::Incagidex => 1000,
         EffectId::Smoke => 500,
-        EffectId::Firefly => 1000,
+        // Original game `FireFly()` sets m_duration = 140 frames (~2333 ms)
+        // explicitly on both the master and the particle prim.
+        EffectId::Firefly => 2333,
         EffectId::Sandwind => 1800,
         // Torch is an ambient looping emitter; original game's duration
         // table value (2500) only applies to a fired-skill Torch, which the

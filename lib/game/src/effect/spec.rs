@@ -108,8 +108,55 @@ pub struct SprBurstParams {
     /// -size/duration` on Steal-style emitters.
     pub size_shrink: bool,
     /// When `true`, alpha oscillates around the linear fade envelope
-    /// instead of monotonically fading. Approximation of `PT_TWINKLE` —
-    /// not a per-keyframe match, but reproduces the firefly's visible
-    /// pulsing without a full `m_chPoint` keyframe vector.
+    /// instead of monotonically fading. Approximation of `PT_TWINKLE`
+    /// for emitters that don't supply [`Self::alpha_keyframes`] —
+    /// reproduces the visible pulsing with a sin² envelope. When
+    /// `alpha_keyframes` is non-empty the renderer uses the per-particle
+    /// sawtooth driven by those keyframes instead, matching the
+    /// original game's exact behaviour.
     pub twinkle: bool,
+    /// Optional `PT_CURVE` parameters. When `Some`, each particle
+    /// re-randomizes its heading (longitude/latitude perturbed by
+    /// `angle_jitter_deg`) and optionally its speed at a periodic
+    /// interval drawn from `subsequent_period_frames`. Mirrors the
+    /// original game's curved-path drift on PP_3DPARTICLE.
+    pub curve: Option<CurveParams>,
+    /// Optional `PT_TWINKLE` alpha keyframes (`m_chPoint` /
+    /// `m_chVal1` / `m_chVal2` in the original game). Each entry's
+    /// `at_frame` is in 60 fps ticks; when the particle reaches that
+    /// age, its alpha and alpha_max are reset to the values in the
+    /// entry, then the sawtooth oscillation continues from there.
+    /// Empty `&[]` = no keyframe schedule; the renderer falls back
+    /// to the linear fade envelope (plus sin² pulse when `twinkle`).
+    pub alpha_keyframes: &'static [AlphaKeyframe],
+}
+
+/// Parameters for the `PT_CURVE` periodic heading-jitter behaviour.
+#[derive(Clone, Copy, Debug)]
+pub struct CurveParams {
+    /// Frames before the first re-randomization, inclusive range
+    /// (5..=30 matches firefly's initial `m_count = random(25) + 5`).
+    pub initial_period_frames: (u32, u32),
+    /// Frames between subsequent re-randomizations, inclusive range
+    /// (5..=15 matches firefly's `m_count = random(10) + 5`).
+    pub subsequent_period_frames: (u32, u32),
+    /// Maximum random perturbation applied to longitude and latitude
+    /// each curve tick. ±40° matches the original game's firefly.
+    pub angle_jitter_deg: f32,
+    /// When `true`, draw a fresh `speed` from the emitter's
+    /// `speed_range` at every curve tick (firefly's behaviour). When
+    /// `false`, keep the spawn-time speed.
+    pub speed_resample: bool,
+}
+
+/// One keyframe in a `PT_TWINKLE` alpha schedule. At `at_frame` (60 fps
+/// ticks since particle spawn), the particle's instantaneous alpha is
+/// reset to `alpha_init` and its oscillation ceiling is reset to
+/// `alpha_max`. Values are 0..1; the renderer multiplies by 255 if
+/// needed.
+#[derive(Clone, Copy, Debug)]
+pub struct AlphaKeyframe {
+    pub at_frame: u32,
+    pub alpha_init: f32,
+    pub alpha_max: f32,
 }
