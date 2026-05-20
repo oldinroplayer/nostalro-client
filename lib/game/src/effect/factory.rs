@@ -297,6 +297,23 @@ pub fn make_effect(id: EffectId, attach: Attach) -> Option<Box<dyn Effect>> {
             effects::bottom_magnus::FOGWALL,
         )),
 
+        // Bottom_Hermode dispatcher (PP_HERMODE) — small rotating cube
+        // emitted as 6 WorldQuad faces with per-face B-channel shading.
+        EffectId::BottomHermode => Box::new(
+            effects::bottom_hermode::BottomHermodeEffect::new(
+                attach,
+                effects::bottom_hermode::HERMODE,
+            ),
+        ),
+        // Bottom_Out dispatcher (PP_BOTTOMOUT) — pulsing camera-facing
+        // billboards. Uses the existing Billboard primitive.
+        EffectId::BottomRokisweil => Box::new(
+            effects::bottom_out::BottomOutEffect::new(
+                attach,
+                effects::bottom_out::ROKISWEIL,
+            ),
+        ),
+
         // Bottom_LandProtector dispatcher (PP_LANDPROTECTOR) — single
         // horizontal square ward with radially-breathing corners. 4 ids.
         EffectId::BottomLa => Box::new(
@@ -467,6 +484,8 @@ pub fn is_real_impl(id: EffectId) -> bool {
             | EffectId::BottomRunner
             | EffectId::BottomTransfer
             | EffectId::BottomSpider
+            | EffectId::BottomHermode
+            | EffectId::BottomRokisweil
     )
 }
 
@@ -536,6 +555,20 @@ mod tests {
             let e = make_effect(id, Attach::WorldPos([0.0; 3])).unwrap();
             assert_eq!(e.str_overlay(), None);
         }
+    }
+
+    #[test]
+    fn bottom_hermode_dispatches_to_world_quad_cube() {
+        assert!(is_real_impl(EffectId::BottomHermode));
+        let e = make_effect(EffectId::BottomHermode, Attach::WorldPos([0.0; 3])).unwrap();
+        assert_eq!(e.str_overlay(), None);
+    }
+
+    #[test]
+    fn bottom_rokisweil_dispatches_to_billboard_pulse() {
+        assert!(is_real_impl(EffectId::BottomRokisweil));
+        let e = make_effect(EffectId::BottomRokisweil, Attach::WorldPos([0.0; 3])).unwrap();
+        assert_eq!(e.str_overlay(), None);
     }
 
     #[test]
