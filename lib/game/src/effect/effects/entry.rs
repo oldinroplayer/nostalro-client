@@ -246,7 +246,7 @@ mod tests {
 
     #[test]
     fn outer_top_widens_over_lifetime() {
-        // Sociable test: `m_outerSpeed = 0.08`/frame on the dhxj outer
+        // Sociable test: `m_outerSpeed = 0.08`/frame on the original game outer
         // cone — top radius must grow monotonically from frame 0 → end,
         // while the bottom stays pinned at `m_innerSize = 5`.
         let mut e = EntryEffect::new([0.0; 3]);

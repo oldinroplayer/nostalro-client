@@ -10,7 +10,11 @@
 use models::enums::effect_id::EffectId;
 
 use super::buckets::{is_custom_bucket, is_noop_bucket};
-use super::effects::{bottom_sanctuary_pillar, cast_circle, entry, exit as exit_effect, frost_diver, hit, hit2, hit5_6, magnum_break, sight, status_up, stormgust, volcano, warp};
+use super::effects::{
+    bottom_sanctuary_pillar, cast_circle, entry, exit as exit_effect, firearrow,
+    fireball, frost_diver, hit, hit2, hit5_6, magnum_break, napalmbeat, sandwind,
+    sight, status_up, stormgust, volcano, warp,
+};
 use super::spec::EffectSpec;
 use super::spr_aliases::spr_def;
 use super::spr_burst::spr_burst_params;
@@ -81,6 +85,28 @@ pub fn effect_spec(id: EffectId) -> Option<EffectSpec> {
         // more, so the holder's lifetime is parent + particle envelope.
         EffectId::Exit => EffectSpec::Custom {
             duration_ms: exit_effect::TOTAL_DURATION_MS,
+        },
+
+        // Bucket 0-50 Tier C custom effects — only those whose original game
+        // recipe is **pure PP_*** with no STR file in the classic GRF
+        // get a Custom spec here. Everything else with a real STR
+        // (`enhance.str`, `endure.str`, `bash.str`, `healsp.str`,
+        // `blessing.str`, `icearrow.str`, `portal.str`,
+        // `spraypond.str`, `SafetyWall.str` …) renders better via
+        // the default STR-alias route than via the hand-rolled
+        // primitive approximation, so we leave those alone until a
+        // recipe + texture set actually beats the STR.
+        EffectId::Firearrow => EffectSpec::Custom {
+            duration_ms: firearrow::TOTAL_DURATION_MS,
+        },
+        EffectId::Fireball => EffectSpec::Custom {
+            duration_ms: fireball::TOTAL_DURATION_MS,
+        },
+        EffectId::Napalmbeat => EffectSpec::Custom {
+            duration_ms: napalmbeat::TOTAL_DURATION_MS,
+        },
+        EffectId::Sandwind => EffectSpec::Custom {
+            duration_ms: sandwind::TOTAL_DURATION_MS,
         },
 
         // Frost Diver family — QuadHorn ice spikes. FrostDiver2 is the
@@ -352,7 +378,7 @@ mod tests {
 
     #[test]
     fn darkbreath_tints_red_and_overrides_table_duration() {
-        // dhxj zeroes m_green / m_blue so DarkBreath renders pure red,
+        // original game zeroes m_green / m_blue so DarkBreath renders pure red,
         // and overrides the table value (500 frames → 5000 ms in our
         // table) with m_duration=65 in the function body. The explicit
         // table.rs arm pins the visible lifetime to ~1083 ms (65 frames
@@ -676,7 +702,7 @@ fn default_duration_ms(id: EffectId) -> u32 {
         EffectId::Potion6 => 1000,
         EffectId::Potion7 => 1000,
         EffectId::Potion8 => 1000,
-        // dhxj overrides the table value (500) inside DarkBreath() with
+        // original game overrides the table value (500) inside DarkBreath() with
         // m_duration = 65 frames → 1083 ms at 60 fps.
         EffectId::Darkbreath => 1083,
         EffectId::Deffender => 99990,

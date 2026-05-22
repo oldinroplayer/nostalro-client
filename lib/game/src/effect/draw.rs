@@ -98,7 +98,7 @@ pub enum EffectPrimitiveDraw {
         /// local-frame vertices are built and *before* `rotation_y_deg`.
         /// 0 = vertical pillar (default — preserves the existing
         /// behaviour for BottomSanc, cast-circle, volcano, BeginSpell6).
-        /// dhxj's `PP_3DCYLINDER` for the Hit family sets `m_latitude =
+        /// original game's `PP_3DCYLINDER` for the Hit family sets `m_latitude =
         /// -90°` which corresponds to `tilt_x_rad = -π/2`, laying the
         /// flared cone on its side so its axis points horizontally;
         /// `rotation_y_rad` then aims that axis at a compass heading.
@@ -262,7 +262,7 @@ pub enum EffectPrimitiveDraw {
     /// Used by effects whose silhouette is an arbitrary 3D rectangle —
     /// most notably the Bard/Dancer Bottom_Vertical songs, which paint
     /// thin vertical curtain strips anchored at two ground points and
-    /// extending straight up to `max_height` (dhxj `PP_BOTTOM2` via
+    /// extending straight up to `max_height` (original game `PP_BOTTOM2` via
     /// `RenderBottom2`).
     ///
     /// Corners are listed CCW when viewed from the "front" face; the

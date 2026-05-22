@@ -9,7 +9,7 @@
 //!     viewer; native -Y means positive offset is below).
 //!
 //! Wait — clarification: native -Y up means `y = -12` sits 12 units
-//! *above* the actor's feet. dhxj does `vec.y -= distance` (with
+//! *above* the actor's feet. original game does `vec.y -= distance` (with
 //! distance=1.6) to derive the lower corners, which in native -Y-up
 //! actually moves them *upward* by 1.6 units. So the cube sits between
 //! `y = m_pos.y - 12 + snA` (upper) and `y = m_pos.y - 12 + snA - 1.6`
@@ -131,7 +131,7 @@ impl Effect for BottomHermodeEffect {
         // Top face: 4 upper corners. R/G channel = rg_tint, B = 250.
         push_face(out, upper, uv, self.params.texture, rg, FACE_B_TOP, alpha);
         // Side faces — connect each upper-lower pair forming the 4
-        // vertical sides. dhxj order: (vecB_pre, vecB_now, vec2, vec1),
+        // vertical sides. original game order: (vecB_pre, vecB_now, vec2, vec1),
         // (vecB_now, vecT_now, vec4, vec2), (vecT_now, vecT_pre, vec3,
         // vec4), (vecT_pre, vecB_pre, vec1, vec3). `vec_i` are the
         // lower ring.

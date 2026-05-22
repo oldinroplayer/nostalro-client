@@ -8,7 +8,7 @@
 //! * **FrostDiver2 (id 28)** — `CRagEffect::FrostDiver2()` spawns **8 spikes
 //!   at frame 0**, tightly clustered. Anchored on a single world point
 //!   (`Attach::WorldPos`). One-shot.
-//! * **FrostDiver (id 27)** — projectile-trail. dhxj advances a cursor 2
+//! * **FrostDiver (id 27)** — projectile-trail. orig advances a cursor 2
 //!   units per frame along the caster→target line and spawns one spike
 //!   per frame, stopping when the remaining distance is `≤ 2.5`. With
 //!   `Attach::Trail { from, to }` the spike count is therefore
@@ -35,15 +35,15 @@ pub const TEXTURES: &[&str] = &[ICE_TEXTURE];
 
 const FRAMES_PER_SECOND: f32 = 60.0;
 
-/// Tunable parameter set for one Frost Diver variant. dhxj's FrostDiver
+/// Tunable parameter set for one Frost Diver variant. orig's FrostDiver
 /// and FrostDiver2 share the QuadHorn primitive but pick from different
 /// random ranges for size/height/spread — FrostDiver's spikes are slim
 /// and tall, FrostDiver2's are chunkier and tightly clustered.
 #[derive(Clone, Copy)]
 pub struct FrostDiverParams {
-    /// Inclusive range for the total ice-spike count per cast. dhxj's
+    /// Inclusive range for the total ice-spike count per cast. orig's
     /// FrostDiver2 hard-codes `for (i = 0; i < 8)` so its range is `(8, 8)`;
-    /// dhxj's FrostDiver spawns one spike per frame as the projectile
+    /// orig's FrostDiver spawns one spike per frame as the projectile
     /// travels toward the target — without the projectile pipeline we
     /// emulate the variable count with a small random range per cast.
     pub spike_count_range: (u32, u32),
@@ -54,55 +54,55 @@ pub struct FrostDiverParams {
     /// Lifetime per spike, frames.
     pub spike_duration_frames: f32,
     /// Inclusive range for the random base half-width per spike (world
-    /// units). Mirrors dhxj's `m_size` random formula.
+    /// units). Mirrors orig's `m_size` random formula.
     pub base_half_width_range: (f32, f32),
     /// Inclusive range for the random per-spike height (world units).
-    /// Mirrors dhxj's `m_heightSize` random formula, scaled to match the
-    /// gif silhouette in our coord system (~3× smaller than dhxj numbers,
+    /// Mirrors orig's `m_heightSize` random formula, scaled to match the
+    /// gif silhouette in our coord system (~3× smaller than orig numbers,
     /// cf. `stormgust.rs` `SPIKE_HEIGHT`).
     pub height_range: (f32, f32),
     /// Inclusive range for the spawn-time offset radius from the burst
-    /// centre. Mirrors dhxj's `length` random formula. FrostDiver
+    /// centre. Mirrors orig's `length` random formula. FrostDiver
     /// spreads its spikes; FrostDiver2 clusters them tightly.
     pub spawn_radius_range: (f32, f32),
 }
 
 /// FrostDiver2 (`EF_FROSTDIVER2`, id 28) — one-shot 8-spike burst,
-/// chunky bases tightly clustered. Sizes from dhxj's `FrostDiver2()`
+/// chunky bases tightly clustered. Sizes from orig's `FrostDiver2()`
 /// random ranges, scaled so the silhouette matches the reference gif.
 pub const FROSTDIVER2: FrostDiverParams = FrostDiverParams {
-    // dhxj: `for (int i = 0; i < 8; i++)` — fixed at 8.
+    // orig: `for (int i = 0; i < 8; i++)` — fixed at 8.
     spike_count_range: (8, 8),
     burst_over_frames: 0.0,
     spike_duration_frames: 40.0,
-    // dhxj: m_size = (rand(250)+100)/100 → 1.0..3.5.
+    // orig: m_size = (rand(250)+100)/100 → 1.0..3.5.
     base_half_width_range: (0.6, 1.4),
-    // dhxj: m_heightSize = (rand(100)+200)/10 → 20..30.
+    // orig: m_heightSize = (rand(100)+200)/10 → 20..30.
     height_range: (4.0, 6.5),
-    // dhxj: length = (rand(4)+1)/10 → 0.1..0.5 (very tight cluster).
+    // orig: length = (rand(4)+1)/10 → 0.1..0.5 (very tight cluster).
     // Scaled up to give a visible footprint in our coord scale.
     spawn_radius_range: (1.5, 5.0),
 };
 
 /// FrostDiver (`EF_FROSTDIVER`, id 27) — slim, tall spikes spread
-/// further apart along the projectile trail. Original dhxj spawns one
+/// further apart along the projectile trail. Original orig spawns one
 /// spike per frame as the projectile travels toward the target; without
 /// the projectile pipeline we approximate that with a staggered burst.
 pub const FROSTDIVER: FrostDiverParams = FrostDiverParams {
-    // Reference gif shows ~3–5 visible spikes at peak. dhxj's count is
+    // Reference gif shows ~3–5 visible spikes at peak. orig's count is
     // determined by projectile travel time, which we don't simulate;
     // pick a random small count per cast to vary the silhouette.
     spike_count_range: (3, 5),
     burst_over_frames: 14.0,
     spike_duration_frames: 40.0,
-    // dhxj: m_size = (rand(40)+60)/100 → 0.6..1.0. Roughly half FD2's
+    // orig: m_size = (rand(40)+60)/100 → 0.6..1.0. Roughly half FD2's
     // base width — produces the slimmer silhouette.
     base_half_width_range: (0.3, 0.6),
-    // dhxj: m_heightSize = (rand(30)+150)/10 → 15..18. Slightly shorter
+    // orig: m_heightSize = (rand(30)+150)/10 → 15..18. Slightly shorter
     // in absolute terms than FD2 but with a much taller aspect ratio
     // because the base is so narrow.
     height_range: (7.0, 10.0),
-    // dhxj: length = (rand(10)+5)/10 → 0.5..1.5. Triple FD2's spread —
+    // orig: length = (rand(10)+5)/10 → 0.5..1.5. Triple FD2's spread —
     // more space between each spike in the trail.
     spawn_radius_range: (3.0, 8.0),
 };
@@ -123,13 +123,13 @@ const SPEED_LIMIT_S: f32 = SPEED_LIMIT_FRAMES / FRAMES_PER_SECOND;
 const PEAK_ALPHA: f32 = 200.0 / 255.0;
 const FADE_OUT_FRAMES: f32 = 10.0;
 
-/// dhxj `m_deltaPos2` step magnitude — the projectile cursor advances 2
+/// orig `m_deltaPos2` step magnitude — the projectile cursor advances 2
 /// world units toward the target each frame.
 const TRAIL_STEP_PER_FRAME: f32 = 2.0;
-/// dhxj `CalcDist <= 2.5f` stop condition — once the cursor is closer
+/// orig `CalcDist <= 2.5f` stop condition — once the cursor is closer
 /// than this to the target, no more spikes are spawned.
 const TRAIL_STOP_DISTANCE: f32 = 2.5;
-/// dhxj initial cursor offset (`m_deltaPos2.MatrixMult(vector3d(0, 0, 5.0f), ...)`)
+/// orig initial cursor offset (`m_deltaPos2.MatrixMult(vector3d(0, 0, 5.0f), ...)`)
 /// — the first spike spawns 5 units back from the target.
 const TRAIL_INITIAL_OFFSET: f32 = 5.0;
 
@@ -223,7 +223,7 @@ impl FrostDiverEffect {
             ^ origin[2].to_bits().rotate_left(11);
 
         let spike_count = if !trail_anchors.is_empty() {
-            // dhxj projectile mode: spike count is determined by the
+            // orig projectile mode: spike count is determined by the
             // distance travelled, not by `spike_count_range`. The cast
             // emits one spike per cursor step along the trail.
             trail_anchors.len() as u32
@@ -322,7 +322,7 @@ impl FrostDiverEffect {
 
 /// Resolve the spawn anchor and (if applicable) the per-spike trail
 /// positions from the `Attach`. For `Attach::Trail { from, to }` we
-/// reproduce dhxj's projectile cursor: starting `TRAIL_INITIAL_OFFSET`
+/// reproduce orig's projectile cursor: starting `TRAIL_INITIAL_OFFSET`
 /// units back from the target, step `TRAIL_STEP_PER_FRAME` units toward
 /// the caster, stopping once the remaining distance to the target is
 /// `≤ TRAIL_STOP_DISTANCE`. Each cursor position becomes one spike's
@@ -342,7 +342,7 @@ fn derive_anchors(from: [f32; 3], to: [f32; 3]) -> ([f32; 3], Vec<[f32; 3]>) {
     let ux = dx / total_dist;
     let uz = dz / total_dist;
     let mut anchors = Vec::new();
-    // dhxj cursor: distance-remaining-to-target. Starts at
+    // orig cursor: distance-remaining-to-target. Starts at
     // `total_dist - TRAIL_INITIAL_OFFSET`, decreases by
     // `TRAIL_STEP_PER_FRAME` each iteration.
     let mut remaining = total_dist - TRAIL_INITIAL_OFFSET;
@@ -431,14 +431,14 @@ mod tests {
     #[test]
     fn fd_trail_lays_spikes_along_caster_to_target_line() {
         // Sociable test: with `Attach::Trail { from, to }`, FrostDiver
-        // reproduces dhxj's projectile cursor — spike count derives from
+        // reproduces orig's projectile cursor — spike count derives from
         // the caster→target distance (one spike per
         // `TRAIL_STEP_PER_FRAME = 2.0` after a `TRAIL_INITIAL_OFFSET =
         // 5.0` setback and stopping `≤ TRAIL_STOP_DISTANCE = 2.5` from
         // the target). Spike anchors lie on the straight line between
         // `from` and `to` in XZ.
         let from = [0.0, 0.0, 0.0];
-        // 25 units along +Z. dhxj: cursor starts at 25 - 5 = 20 units
+        // 25 units along +Z. orig: cursor starts at 25 - 5 = 20 units
         // away from target on the trail; steps 2 each iteration; stops
         // once remaining ≤ 2.5. That schedules 9 spawns (20, 18, 16,
         // 14, 12, 10, 8, 6, 4 — next would be 2 ≤ 2.5).
@@ -522,8 +522,8 @@ mod tests {
     }
 
     #[test]
-    fn fd_and_fd2_size_ranges_differ_per_dhxj() {
-        // Sociable test: dhxj's FrostDiver uses smaller base widths
+    fn fd_and_fd2_size_ranges_differ_per_orig() {
+        // Sociable test: orig's FrostDiver uses smaller base widths
         // and a wider spread than FrostDiver2 — the slim, tall spikes
         // along a projectile trail vs. the chunky tight cluster. Lock
         // those relationships so future tuning doesn't silently
@@ -536,7 +536,7 @@ mod tests {
             FROSTDIVER.height_range.0 > FROSTDIVER2.height_range.1,
             "FD spikes must be taller than FD2"
         );
-        // Spread ranges overlap (dhxj FD length 0.5..1.5 vs FD2 0.1..0.5
+        // Spread ranges overlap (orig FD length 0.5..1.5 vs FD2 0.1..0.5
         // — `0.5` is in both), so we only assert FD's *max* radius is
         // strictly greater than FD2's. That guarantees FD's spikes can
         // sit further out than any FD2 spike, which is the gif
@@ -568,7 +568,7 @@ mod tests {
     }
 
     #[test]
-    fn fd_spike_count_stays_inside_dhxj_range() {
+    fn fd_spike_count_stays_inside_orig_range() {
         // Sociable test: FrostDiver's spike count is randomized per cast
         // but must stay inside `FROSTDIVER.spike_count_range`. We don't
         // pin an exact value — different origins draw different counts

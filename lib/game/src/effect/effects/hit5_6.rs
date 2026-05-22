@@ -1,6 +1,6 @@
 //! `EF_HIT5` / `EF_HIT6` — critical-strike sparkle.
 //!
-//! Both effects in the original game (`RagEffect.cpp:7597` /
+//! Both effects in the orig (`RagEffect.cpp:7597` /
 //! `RagEffect.cpp:7633`) spawn two `PP_2DTEXTURE` billboards at frame 0
 //! arranged in a cross (the second petal offset 90° from the first).
 //! Each petal:
@@ -27,17 +27,17 @@ pub const TEXTURES: &[&str] = &[LENS2];
 const FRAMES_PER_SECOND: f32 = 60.0;
 const PETAL_COUNT: usize = 2;
 
-/// Lift the cross off the ground to chest level. The original game's
+/// Lift the cross off the ground to chest level. The orig's
 /// literal is `m_deltaPos2.y = -20`; the same compensation as Hit2
 /// applies (our viewer's `world_pos` is at the entity's ground anchor).
 const Y_OFFSET_BASE: f32 = -10.0;
 
-/// Linear scale factor on the original game's `widthSize`/`heightSize`
+/// Linear scale factor on the orig's `widthSize`/`heightSize`
 /// literals — same calibration as Hit2.
 const SIZE_SCALE: f32 = 1.0 / 3.0;
 
-/// `m_rollSpeed = -5°/frame` per the original game. CCW positive in
-/// screen space, so the original game's negative roll = clockwise
+/// `m_rollSpeed = -5°/frame` per the orig. CCW positive in
+/// screen space, so the orig's negative roll = clockwise
 /// rotation in our convention.
 const ROLL_SPEED_DEG_PER_FRAME: f32 = -5.0;
 
@@ -49,13 +49,13 @@ pub struct HitCrossParams {
     pub height_max: f32,
     /// `m_heightSpeed` literal (per-frame at 60 fps) — Hit5 = 2.5,
     /// Hit6 = 1.7.
-    pub height_speed_init_dhxj: f32,
+    pub height_speed_init_orig: f32,
     /// `m_heightAccel` literal — both variants use 0.5.
-    pub height_accel_dhxj: f32,
+    pub height_accel_orig: f32,
     /// `m_duration` literal — both variants use 17 frames.
     pub duration_frames: f32,
     /// Constant rotation offset added to the first petal's roll.
-    /// The original game uses `angle[0] = random(360)` for both Hit5
+    /// The orig uses `angle[0] = random(360)` for both Hit5
     /// and Hit6, but the reference gifs (`imgs/0-50/4.gif` /
     /// `imgs/0-50/5.gif`) consistently show Hit5 as a diagonal "×"
     /// and Hit6 as an axis-aligned "+". We pin each variant to its
@@ -70,8 +70,8 @@ pub const HIT5: HitCrossParams = HitCrossParams {
     width_max: 25.0 * SIZE_SCALE,
     height_min: 30.0 * SIZE_SCALE,
     height_max: 40.0 * SIZE_SCALE,
-    height_speed_init_dhxj: 2.5,
-    height_accel_dhxj: 0.5,
+    height_speed_init_orig: 2.5,
+    height_accel_orig: 0.5,
     duration_frames: 17.0,
     // Diagonal "×". The `lens2.tga` texture's bright rays run along
     // its diagonals (each petal looks like an X already), so a roll
@@ -86,8 +86,8 @@ pub const HIT6: HitCrossParams = HitCrossParams {
     width_max: 15.0 * SIZE_SCALE,
     height_min: 15.0 * SIZE_SCALE,
     height_max: 20.0 * SIZE_SCALE,
-    height_speed_init_dhxj: 1.7,
-    height_accel_dhxj: 0.5,
+    height_speed_init_orig: 1.7,
+    height_accel_orig: 0.5,
     duration_frames: 17.0,
     // Axis-aligned "+": petals rolled by 45° so the texture's
     // diagonal rays land on the screen axes.
@@ -123,7 +123,7 @@ struct Petal {
     height: f32,
     /// Per-second width-shrink rate (negative).
     width_speed_world_per_s: f32,
-    /// Integrated per frame like the original game's
+    /// Integrated per frame like the orig's
     /// `m_heightSpeed`/`m_heightAccel`.
     height_speed_per_frame: f32,
     height_accel_per_frame: f32,
@@ -181,7 +181,7 @@ impl HitCrossEffect {
     }
 
     fn spawn_petals(&mut self) {
-        // The original game's `angle[0] = random(360)` would make the
+        // The orig's `angle[0] = random(360)` would make the
         // cross orientation random per-spawn, but the reference gifs
         // pin Hit5 as "×" and Hit6 as "+". Use the variant's fixed
         // `base_roll_offset_rad` to honour the reference orientation;
@@ -208,9 +208,9 @@ impl HitCrossEffect {
                 // `m_widthSpeed = -widthSize / duration` per-frame ->
                 // per-second by × 60.
                 width_speed_world_per_s: -width / self.lifetime,
-                height_speed_per_frame: self.params.height_speed_init_dhxj
+                height_speed_per_frame: self.params.height_speed_init_orig
                     * SIZE_SCALE,
-                height_accel_per_frame: self.params.height_accel_dhxj * SIZE_SCALE,
+                height_accel_per_frame: self.params.height_accel_orig * SIZE_SCALE,
             };
         }
     }
@@ -227,7 +227,7 @@ impl HitCrossEffect {
     }
 
     /// Linear fade-in over the first half, linear fade-out over the
-    /// back half — matches the original game's `m_fadeOutCnt =
+    /// back half — matches the orig's `m_fadeOutCnt =
     /// duration - duration/2`.
     fn alpha(&self) -> f32 {
         let frame = self.age * FRAMES_PER_SECOND;
@@ -315,7 +315,7 @@ mod tests {
         h6.update(&ctx(0.0));
         // The narrower-of-Hit5 must still exceed the widest-of-Hit6,
         // because the size ranges don't overlap (Hit5 width: 20..25 vs
-        // Hit6 width: 10..15 in the original game's units).
+        // Hit6 width: 10..15 in the orig's units).
         assert!(
             h5.params.width_min > h6.params.width_max,
             "Hit5 width range strictly above Hit6"

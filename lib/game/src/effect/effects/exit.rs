@@ -39,7 +39,7 @@ const PARTICLE_FADEOUT_AT: f32 = PARTICLE_DURATION_FRAMES - PARTICLE_DURATION_FR
 const PARTICLE_ANIM_TICKS: f32 = 4.0;
 const PARTICLE_FRAME_MS: f32 = 1000.0 / FRAMES_PER_SECOND * PARTICLE_ANIM_TICKS;
 
-// `m_gravSpeed = -1.2` → initial Y velocity in dhxj per-frame units.
+// `m_gravSpeed = -1.2` → initial Y velocity in original game per-frame units.
 // In native RO coords -Y is up so a particle with -1.2 / frame drifts up.
 const PARTICLE_INITIAL_Y_SPEED_PER_FRAME: f32 = -1.2;
 // `m_gravAccel = -(m_gravSpeed / m_duration) / 1.5` ≈ +0.016 per-frame

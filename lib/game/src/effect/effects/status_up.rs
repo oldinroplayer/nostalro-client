@@ -4,7 +4,7 @@
 //! Incagidex rise, Decagility falls), in the streak tint, and in which label
 //! is drawn (`agi_up.bmp`, `slow.bmp`, `dex_agi_up.bmp`).
 //!
-//! Per-particle dhxj recipe (`CRagEffect::IncAgility()` @ `RagEffect.cpp:9925`,
+//! Per-particle original game recipe (`CRagEffect::IncAgility()` @ `RagEffect.cpp:9925`,
 //! `DecAgility()` @ `:9975`, `IncAGIDEX()` @ `:8280`):
 //!   * every 2 parent frames, spawn one `PP_3DCROSSTEXTURE`
 //!   * random Y-rotation longitude; `deltaPos2 = (radius·sin, 0, radius·cos)`
@@ -45,20 +45,20 @@ const PARTICLE_FADEOUT_AT: f32 = PARTICLE_DURATION_FRAMES - 20.0;
 const PARTICLE_MAX_ALPHA: f32 = 200.0 / 255.0;
 // After the original game's X-rotation of ±90° the cross-texture's
 // `widthSize` becomes the streak's vertical extent and `heightSize`
-// becomes its perpendicular thickness. dhxj literal range
+// becomes its perpendicular thickness. original game literal range
 // `(random(60)+30)/10 = 3..9` reads directly in our world units — the
 // streaks are meant to span roughly one character height, not a
 // fraction of it.
 const PARTICLE_LENGTH_MIN: f32 = 3.0;
 const PARTICLE_LENGTH_MAX: f32 = 7.0;
 const PARTICLE_THICKNESS: f32 = 0.6;
-// dhxj radius `random(7) + 2` = 2..9 wu; gif shows the streaks
+// original game radius `random(7) + 2` = 2..9 wu; gif shows the streaks
 // clustered tight enough to read as one column above the entity, but
 // still wide enough to show several streaks side-by-side around it.
 const RADIUS_MIN: f32 = 2.0;
 const RADIUS_MAX: f32 = 9.0;
 
-// Center label (PP_2DTEXTURE) sizing. dhxj uses half-extents
+// Center label (PP_2DTEXTURE) sizing. original game uses half-extents
 // width=40 / height=20 px in screen space; characters render at
 // roughly 10 px per world unit at the default camera distance, so
 // 4×2 wu approximates the original screen footprint and stays
@@ -69,11 +69,11 @@ const LABEL_HEIGHT_DEC: f32 = 1.25;
 const LABEL_MAX_ALPHA: f32 = 200.0 / 255.0;
 const LABEL_FADE_FRAMES: f32 = 15.0;
 const LABEL_FADEOUT_AT: f32 = PARENT_DURATION_FRAMES - LABEL_FADE_FRAMES;
-// Vertical drift in world units / frame. dhxj's 1.5 / 1.0 px/frame
+// Vertical drift in world units / frame. original game's 1.5 / 1.0 px/frame
 // values map to ~0.15 / 0.10 wu/frame at the same 10 px/wu scale.
 const LABEL_RISE_SPEED: f32 = 0.15;
 const LABEL_FALL_SPEED: f32 = 0.10;
-// Decagility starts the label above the entity (dhxj `m_deltaPos2.y -= 80`
+// Decagility starts the label above the entity (original game `m_deltaPos2.y -= 80`
 // in pixels → ~8 wu in world space, native RO -Y up).
 const LABEL_DEC_SPAWN_Y: f32 = -8.0;
 // Center label sits roughly at chest height above the entity origin
@@ -108,7 +108,7 @@ pub struct Params {
 }
 
 pub const INCAGILITY: Params = Params {
-    // dhxj `m_speed = (random(50)+20)/100` upward = -0.45 avg per frame.
+    // original game `m_speed = (random(50)+20)/100` upward = -0.45 avg per frame.
     initial_speed_per_frame: -0.45,
     accel_per_frame: 0.0,
     spawn_y_offset: 0.0,
@@ -120,7 +120,7 @@ pub const INCAGILITY: Params = Params {
 };
 
 pub const DECAGILITY: Params = Params {
-    // dhxj `m_accel = 0.015` downward; no initial speed. Particle starts
+    // original game `m_accel = 0.015` downward; no initial speed. Particle starts
     // 20 wu above ground (`m_deltaPos2.y -= 20`) and falls toward it.
     initial_speed_per_frame: 0.0,
     accel_per_frame: 0.015,
@@ -228,7 +228,7 @@ impl StatusUpEffect {
         let length = PARTICLE_LENGTH_MIN
             + self.lcg_float() * (PARTICLE_LENGTH_MAX - PARTICLE_LENGTH_MIN);
         let (sn, cs) = longitude_deg.to_radians().sin_cos();
-        // dhxj `m_deltaPos2 = (0, 0, radius) × m_matrix.MakeYRotation(long)`
+        // original game `m_deltaPos2 = (0, 0, radius) × m_matrix.MakeYRotation(long)`
         // expands to (radius·sin, 0, radius·cos).
         self.particles.push(Particle {
             anchor: self.world_pos,

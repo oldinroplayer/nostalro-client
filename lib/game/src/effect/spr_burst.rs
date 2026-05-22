@@ -193,7 +193,7 @@ pub fn spr_burst_params(id: EffectId) -> Option<(&'static str, SprBurstParams)> 
                 // ~30 unit/s² downward pull is a visible arc over the
                 // 500 ms lifetime.
                 gravity_world_per_sec2: 36.0,
-                // -90+40..-90+140 in dhxj latitudes = -50..50 from the
+                // -90+40..-90+140 in original game latitudes = -50..50 from the
                 // horizontal plane — most particles go up, some sideways.
                 cone_latitude_deg: Some((40.0, 140.0)),
                 size_shrink: true,
@@ -206,7 +206,7 @@ pub fn spr_burst_params(id: EffectId) -> Option<(&'static str, SprBurstParams)> 
         // PP_3DPARTICLE on a flat disc around the master (radius
         // 2..8), spawn 20 above ground, negative speed so the
         // particle drifts downward. particle3.spr like the rest of
-        // the poison family. Master duration ≈ 80 frames in dhxj.
+        // the poison family. Master duration ≈ 80 frames in original game.
         EffectId::Slowpoison => Some((
             "data/sprite/이팩트/particle3",
             SprBurstParams {
@@ -228,6 +228,11 @@ pub fn spr_burst_params(id: EffectId) -> Option<(&'static str, SprBurstParams)> 
                 alpha_keyframes: &[],
             },
         )),
+        // Note: EF_COIN (id 10) is hybrid — the STR `Maemor` carries the
+        // visible ground rings in the reference gif (`0-50/10.gif`) and
+        // the PP_3DPARTICLEGRAVITY coins are secondary. Routing it via
+        // SprBurst here would lose the STR, so it stays on the default
+        // STR path until a Custom hybrid impl is written.
         // Original game `EnchantPoison2()` (= EF_EDP): every 3 frames
         // a single PP_3DPARTICLE on the standard particle3.spr disc.
         // Smaller particles (0.2..0.4) and faster cadence than the

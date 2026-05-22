@@ -46,7 +46,7 @@ pub struct Params {
     /// for the modulo at frame-cycle time; 13 matches every original-game
     /// `EffectTextureSet_Animation` variant.
     pub textures: &'static [&'static str],
-    /// Game ticks per texture step (`tcount` in dhxj). 6 → 100 ms/step at
+    /// Game ticks per texture step (`tcount` in original game). 6 → 100 ms/step at
     /// 60 fps.
     pub tcount: u32,
     /// `m_GI[0].distance` — half-diagonal of the rendered square in world
@@ -119,7 +119,7 @@ pub const TORCH_VIOLET_TEXTURES: &[&str] = &[
 ];
 
 /// 9 frames of the ambient dust mote — `EffectTextureSet_Animation(0)` in
-/// dhxj. tcount differs (8 vs 6) because the prim's update reads
+/// original game. tcount differs (8 vs 6) because the prim's update reads
 /// `flag1[4] == 0` to pick the slower cadence.
 pub const DUST_TEXTURES: &[&str] = &[
     "dust01.bmp",

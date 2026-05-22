@@ -35,7 +35,7 @@ use crate::effect::effect_trait::{Effect, EffectRenderCtx, EffectUpdateCtx};
 const FRAMES_PER_SECOND: f32 = 60.0;
 const FADE_THRESHOLD_FRAMES: u32 = 10;
 /// 10-frame ramp + 51 fade frames (250 → 0 stepping by 5/frame includes
-/// the frame where `alphaB` hits 0). dhxj resets `process` only after
+/// the frame where `alphaB` hits 0). original game resets `process` only after
 /// `alphaB` actually reaches 0 — that's frame 60 — so the cycle period
 /// is 61 frames before the next ramp starts.
 const CYCLE_LENGTH_FRAMES: u32 = 61;
@@ -67,10 +67,10 @@ pub struct BottomOutEffect {
     params: BottomOutParams,
     age: f32,
     frames: u32,
-    /// Per-cell billboard half-size (= `distance` in dhxj). Each cell
+    /// Per-cell billboard half-size (= `distance` in original game). Each cell
     /// gets an independent random in [5, 11) at spawn.
     cell_sizes: [f32; CELL_COUNT],
-    /// Per-cell pulse-cycle phase offset, frozen at spawn (dhxj
+    /// Per-cell pulse-cycle phase offset, frozen at spawn (original game
     /// `process = random(11)`).
     cell_phase_init: [u32; CELL_COUNT],
 }

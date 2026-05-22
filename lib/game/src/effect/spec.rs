@@ -69,7 +69,7 @@ pub enum EffectSpec {
     /// `m_repeatAnim` — when `false` the renderer clamps to the last motion
     /// rather than looping; `tint` is an RGBA multiplier (`[1.0; 4]` = no
     /// tint, matches `PT_USEORGARGB`). DarkBreath uses `[1.0, 0.0, 0.0, 1.0]`
-    /// because dhxj zeroes `m_green` / `m_blue`.
+    /// because original game zeroes `m_green` / `m_blue`.
     Spr {
         sprite: &'static str,
         duration_ms: u32,

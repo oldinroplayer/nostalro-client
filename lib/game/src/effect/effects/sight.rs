@@ -79,7 +79,7 @@ pub const SIGHT: Params = Params {
         // (above the master) with `m_deltaPosAccel.y = 0.1` pulling
         // it back to ground over the 20-frame lifetime. The user
         // wants the orbit to read like Ruwach (constant-height arc),
-        // so we hold the particle at the dhxj spawn height and
+        // so we hold the particle at the original game spawn height and
         // remove the downward drift.
         y_offset: -20.0,
         y_accel_per_frame: 0.0,
