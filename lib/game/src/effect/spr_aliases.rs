@@ -30,6 +30,8 @@ pub struct SprDef {
     /// to original game's `PT_USEORGARGB`). Effects that zero a channel — e.g.
     /// DarkBreath setting `m_green = m_blue = 0` — populate this.
     pub tint: [f32; 4],
+    /// Y-offset in world units (negative = upward). Mirrors `m_deltaPos2.y`.
+    pub pos_y: f32,
 }
 
 impl SprDef {
@@ -40,6 +42,7 @@ impl SprDef {
             anim_speed: 4.0,
             repeat: true,
             tint: [1.0, 1.0, 1.0, 1.0],
+            pos_y: 0.0,
         }
     }
     const fn with_size(mut self, size_scale: f32) -> Self {
@@ -58,6 +61,10 @@ impl SprDef {
         self.tint = tint;
         self
     }
+    const fn with_pos_y(mut self, pos_y: f32) -> Self {
+        self.pos_y = pos_y;
+        self
+    }
 }
 
 pub fn spr_def(id: EffectId) -> Option<SprDef> {
@@ -71,9 +78,10 @@ pub fn spr_def(id: EffectId) -> Option<SprDef> {
         // default since there's no direct equivalent.
         EffectId::Maple => SprDef::new("data/sprite/이팩트/단풍"),
         // Aqua: animSpeed=2, m_repeatAnim=false in original game `Aqua()`.
-        EffectId::Aqua => SprDef::new("data/sprite/이팩트/아쿠아플레이")
+        EffectId::Aqua => SprDef::new("data/sprite/이팩트/성수뜨기")
             .with_anim_speed(2.0)
-            .one_shot(),
+            .one_shot()
+            .with_pos_y(-20.0),
         // Vallentine(0): animSpeed=2, m_repeatAnim=false.
         EffectId::Vallentine => SprDef::new("data/sprite/이팩트/vallentine")
             .with_anim_speed(2.0)
