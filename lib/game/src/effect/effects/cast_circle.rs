@@ -91,6 +91,11 @@ const RING_TEXTURE: &str = "alpha_down.tga";
 /// land on the same per-segment cadence.
 const PETAL_SIDES: u32 = 20;
 const PETAL_UV_REPEAT: f32 = 1.0;
+/// Original game's `m_GI[ec].full_display_angle = 315` for the three petal
+/// emitters in `BeginCasting` (`RagEffect2.cpp:108`). Leaves a 45° gap; the
+/// three petals' RotStart values 0°/90°/180° interleave so the gaps don't
+/// stack.
+const PETAL_ARC_DEG: f32 = 315.0;
 /// Per-petal rise angle from horizontal — matches the original game's
 /// `BeginCasting` `rise_angle` literals (70°, 57°, 45°): the innermost ring
 /// flares almost straight up, the outermost ring is closer to a flat splay.
@@ -256,6 +261,7 @@ impl Effect for CastCircleEffect {
                     top_size: self.params.column_radius + col_cos * max_h,
                     height,
                     sides: COLUMN_SIDES,
+                    arc_angle_deg: 360.0,
                     rotation: 0.0,
                     uv_repeat: COLUMN_UV_REPEAT,
                     uv_scroll: [0.0, 0.0],
@@ -306,6 +312,7 @@ impl Effect for CastCircleEffect {
                     top_size: distance + cos_rise * max_h,
                     height: sin_rise * max_h,
                     sides: PETAL_SIDES,
+                    arc_angle_deg: PETAL_ARC_DEG,
                     rotation: spin_rad + offset_rad,
                     uv_repeat: PETAL_UV_REPEAT,
                     uv_scroll: [0.0, 0.0],

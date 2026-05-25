@@ -35,6 +35,15 @@ pub struct EffectRenderCtx {
     pub elapsed: f32,
 }
 
+/// Transient tint applied to the master sprite while an effect is active.
+/// Matches the original game's `m_master->SetArgb(-1, R, G, B)` calls
+/// (PortalWind, GumGang, etc.). RGB only — alpha is always opaque
+/// (`-1` in dhxj means "leave alpha alone").
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct BodyTint {
+    pub rgb: [u8; 3],
+}
+
 pub trait Effect: Send {
     fn update(&mut self, ctx: &EffectUpdateCtx) -> EffectStatus;
     fn collect_draws(&self, out: &mut EffectDrawList, ctx: &EffectRenderCtx);
@@ -43,6 +52,25 @@ pub trait Effect: Send {
     /// emits a `StrSnapshot` for non-`None` returns each frame, attached to
     /// the same world position. Default `None` — pure-primitive effects.
     fn str_overlay(&self) -> Option<&'static str> {
+        None
+    }
+
+    /// Per-frame body tint to apply to the master sprite. Returns `Some`
+    /// only during the effect's tint window (e.g. PortalWind's
+    /// `m_stateCnt ∈ [5, 25]`). Default `None` — most effects do not tint.
+    /// The renderer's actor pass is responsible for reading this and
+    /// composing it with the sprite's base colour.
+    fn body_tint(&self) -> Option<BodyTint> {
+        None
+    }
+
+    /// One-shot SFX request — the effect returns the wave path the *first*
+    /// time it's ready, then `None` on every subsequent call. The
+    /// holder/audio bridge drains this once per frame and queues the sound.
+    /// Path uses the original game's backslash-separated form (e.g.
+    /// `"effect\\windwalk.wav"`) so the lookup matches GRF / file-system
+    /// naming. Default `None` — most effects don't trigger SFX.
+    fn take_sfx_request(&mut self) -> Option<&'static str> {
         None
     }
 }
