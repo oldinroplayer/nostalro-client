@@ -31,6 +31,14 @@ pub fn str_aliases(id: EffectId) -> &'static [&'static str] {
         EffectId::Frostdiver2 => &["frostdiver2"],
         EffectId::Lightbolt => &["Lightning", "windhit1", "windhit2", "windhit3"],
         EffectId::Thunderstorm => &["thunderstorm"],
+        // Thunderstorm2: the original C++ client uses
+        // `misc\thunder_storm.spr` (absent from the classic GRF) and the
+        // JS reference client points at `setsudan.str` (also missing —
+        // not present in robrowser's data either). Re-using the classic
+        // `thunderstorm` STR is the closest visual match available
+        // without renewal-era assets, and the actor sees something
+        // instead of nothing.
+        EffectId::Thunderstorm2 => &["thunderstorm"],
         EffectId::Teleportation => &["teleportation"],
         EffectId::Readyportal => &["readyportal"],
         EffectId::Incagility => &["incagility"],
@@ -534,7 +542,6 @@ pub fn str_aliases(id: EffectId) -> &'static [&'static str] {
         EffectId::Sma => &["sma"],
         EffectId::Sma2 => &["sma2"],
         EffectId::Stin2 => &["stin2"],
-        EffectId::Hittexture => &["hittexture"],
         EffectId::Stin3 => &["stin3"],
         EffectId::Sma3 => &["sma3"],
         EffectId::Bluefall => &["bluefall"],
@@ -601,7 +608,6 @@ pub fn str_aliases(id: EffectId) -> &'static [&'static str] {
         EffectId::Hyousensou => &["freeze"],
         EffectId::BottomSuiton => &["bottom_suiton"],
         EffectId::Stin4 => &["stin4"],
-        EffectId::Thunderstorm2 => &["thunderstorm"],
         EffectId::Chemical4 => &["chemical4"],
         EffectId::Stin5 => &["stin5"],
         EffectId::MadnessBlue => &["madness_blue"],
