@@ -598,6 +598,35 @@ pub fn make_effect(id: EffectId, anchor: EffectAnchor, hit_count: Option<u8>) ->
             effects::bottom_song::HUMMING,
         )),
 
+        // Bottom_Volcano dispatcher (PP_GI_4) — single-slot radial
+        // particle column rising at 80°. NOT a Bottom_Music variant
+        // despite the BottomVo/De/Vi/Suiton naming: original game
+        // routes these ids to `Bottom_Volcano`, not `Bottom_Music`
+        // (RagEffect.cpp:4971-4974, 3014).
+        EffectId::BottomVo => Box::new(effects::bottom_volcano::BottomVolcanoEffect::new(
+            anchor.point(),
+            effects::bottom_volcano::VOLCANO_RED,
+        )),
+        EffectId::BottomDe => Box::new(effects::bottom_volcano::BottomVolcanoEffect::new(
+            anchor.point(),
+            effects::bottom_volcano::VOLCANO_BLUE,
+        )),
+        EffectId::BottomVi => Box::new(effects::bottom_volcano::BottomVolcanoEffect::new(
+            anchor.point(),
+            effects::bottom_volcano::VOLCANO_GREEN,
+        )),
+        EffectId::BottomSuiton => Box::new(effects::bottom_volcano::BottomVolcanoEffect::new(
+            anchor.point(),
+            effects::bottom_volcano::SUITON,
+        )),
+
+        // Basilica dispatcher (PP_RECT_UP2) — two-call stack
+        // (F1=0 + F1=1) producing 8 cells of layered square pillars.
+        // Distinct from Bottom_Magnus's PP_RECT_UP.
+        EffectId::BottomBasilica => {
+            Box::new(effects::basilica::BasilicaEffect::new(anchor.point()))
+        }
+
         // Bottom_Magnus dispatcher — 4-sided square pillar via
         // `EffectPrimitiveDraw::Frustum`. BottomSanc (F1=1) already
         // has its own dedicated impl (`bottom_sanctuary_pillar.rs`)
@@ -894,6 +923,11 @@ pub fn is_real_impl(id: EffectId) -> bool {
             | EffectId::BottomHumming
             | EffectId::BottomMag
             | EffectId::BottomFogwall
+            | EffectId::BottomVo
+            | EffectId::BottomDe
+            | EffectId::BottomVi
+            | EffectId::BottomSuiton
+            | EffectId::BottomBasilica
             | EffectId::BottomDissonance
             | EffectId::BottomUglydance
             | EffectId::BottomAssassincross
@@ -1143,6 +1177,41 @@ mod tests {
                 None,
                 "{:?} is pure custom, no STR overlay",
                 id
+            );
+        }
+    }
+
+    #[test]
+    fn bottom_volcano_and_basilica_dispatch_to_real_impl() {
+        // Sociable: the 5 ids historically misclassified as BottomSong
+        // (RagEffect.cpp:4971-4974, 4999, 3014) must route to
+        // BottomVolcano / Basilica, not the pink placeholder, with no
+        // STR overlay attached. The spec must also resolve to Custom —
+        // a stray `str_aliases` entry would shadow the factory dispatch
+        // and the holder would try to load a non-existent .str file
+        // instead of running our effect.
+        use super::super::spec::{EffectAnchor, EffectSpec};
+        use super::super::table::effect_spec;
+        for id in [
+            EffectId::BottomVo,
+            EffectId::BottomDe,
+            EffectId::BottomVi,
+            EffectId::BottomSuiton,
+            EffectId::BottomBasilica,
+        ] {
+            assert!(is_real_impl(id), "{:?} must have a real factory impl", id);
+            let e = make_effect(id, EffectAnchor::Point([0.0; 3]), None).unwrap();
+            assert_eq!(
+                e.str_overlay(),
+                None,
+                "{:?} is pure custom, no STR overlay",
+                id
+            );
+            assert!(
+                matches!(effect_spec(id), Some(EffectSpec::Custom { .. })),
+                "{:?} spec must be Custom, got {:?}",
+                id,
+                effect_spec(id),
             );
         }
     }
