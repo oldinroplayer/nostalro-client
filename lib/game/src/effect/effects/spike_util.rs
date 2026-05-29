@@ -44,6 +44,22 @@ pub fn rise_step(base: &mut [f32; 3], velocity: [f32; 3], age: f32, dt: f32, spe
     base[2] += velocity[2] * effective_dt;
 }
 
+/// Damped-spring height envelope for a spike that erupts, overshoots, and
+/// vibrates down to its rest height — the original game's central
+/// `PP_3DQUADHORN` shoots up (`m_speed`/`m_accel`), then at `m_ChangePoint`
+/// flips to a negative `m_ChangeSpeed` (retract) before `PTQH_SPEEDLIMIT`
+/// freezes it. Rather than replay those discrete phases we model the
+/// equivalent settle as a critically-underdamped spring:
+///
+/// `scale(t) = 1 - e^(-decay·t)·cos(omega·t)`
+///
+/// `scale(0) = 0` (erupts from the ground), overshoots above 1 at the first
+/// half-period, then rings down to 1.0. `omega` (rad/s) sets the vibration
+/// rate, `decay` (1/s) how fast it settles.
+pub fn spring_height_scale(age: f32, omega: f32, decay: f32) -> f32 {
+    1.0 - (-decay * age).exp() * (omega * age).cos()
+}
+
 /// Hold `peak` alpha until `fade_out_frames` before the end of `duration`,
 /// then ramp linearly to 0 (original game `m_fadeOutCnt = m_duration - 10`).
 pub fn fade_tail_alpha(age: f32, duration: f32, peak: f32, fade_out_frames: f32) -> f32 {

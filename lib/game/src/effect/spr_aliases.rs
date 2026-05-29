@@ -95,10 +95,32 @@ pub fn spr_def(id: EffectId) -> Option<SprDef> {
             .with_size(1.2)
             .with_pos_y(-1.0),
         EffectId::NpcStop => SprDef::new("data/sprite/이팩트/스톱"),
+        // Wink (`CHIMTO(1)`) is a Custom effect (`effects/wink.rs`), not a
+        // `spr_def` — it picks one of wink.spr's four directional actions from
+        // the camera angle, which the data-driven Spr path can't do.
         // Hamicastle: original game `Effect_SPR(0)` sets `m_animSpeed = 2`,
         // `m_repeatAnim = false`, `PT_USEORGARGB`. The sprite path is the
         // EUC-KR transliteration of `misc\kaeseulring.spr`.
         EffectId::Hamicastle => SprDef::new("data/sprite/이팩트/캐슬링")
+            .with_anim_speed(2.0)
+            .one_shot(),
+        // Item status billboards — `Effect_SPR(2..6)`. Same setup as the other
+        // `Effect_SPR` entries: `m_animSpeed = 2`, `m_repeatAnim = false`,
+        // `PT_USEORGARGB` (default tint). One-shot one-frame-deep PP_3DPARTICLE
+        // with no drift, so a held one-shot Spr reproduces them.
+        EffectId::ItemThunder => SprDef::new("data/sprite/이팩트/item_thunder")
+            .with_anim_speed(2.0)
+            .one_shot(),
+        EffectId::ItemCloud => SprDef::new("data/sprite/이팩트/item_cloud")
+            .with_anim_speed(2.0)
+            .one_shot(),
+        EffectId::ItemCurse => SprDef::new("data/sprite/이팩트/item_curse")
+            .with_anim_speed(2.0)
+            .one_shot(),
+        EffectId::ItemZzz => SprDef::new("data/sprite/이팩트/item_zzz")
+            .with_anim_speed(2.0)
+            .one_shot(),
+        EffectId::ItemRain => SprDef::new("data/sprite/이팩트/item_rain")
             .with_anim_speed(2.0)
             .one_shot(),
         EffectId::Hamiblood => SprDef::new("data/sprite/이팩트/블러드러스트").one_shot(),
