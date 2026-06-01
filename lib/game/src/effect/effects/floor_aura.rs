@@ -48,9 +48,6 @@ const PULSE_HALF: f32 = 0.1;
 /// z-fighting with the terrain.
 const GROUND_LIFT: f32 = -0.3;
 
-/// `alphaB = 200` → peak alpha.
-const ALPHA_MAX: f32 = 200.0 / 255.0;
-
 /// Alpha ramp-in window (frames) so the aura doesn't pop in.
 const FADE_IN_FRAMES: f32 = 16.0;
 
@@ -62,6 +59,9 @@ pub struct FloorAuraParams {
     /// Corner radius (half-diagonal of the square) at full size, world units.
     /// Matches the original game's `m_GI[ec].distance = 15`.
     pub radius: f32,
+    /// Peak alpha (the original game's `alphaB`). Level-99 auras hold 200/255;
+    /// the map-zone sparkle floor (`MAP_PIKA`) is much fainter at 25/255.
+    pub alpha_max: f32,
 }
 
 /// `EF_LEVEL992` — blue floor aura (`Level99_2("pikapika2.bmp")`, size 4).
@@ -69,6 +69,7 @@ pub const LV99_BLUE: FloorAuraParams = FloorAuraParams {
     texture: "pikapika2.bmp",
     color_rgb: [0.39, 0.39, 1.00],
     radius: 15.0,
+    alpha_max: 200.0 / 255.0,
 };
 
 /// `EF_LEVEL996` — green floor aura (`Level99_2("pikapika2.bmp", 1)`, size 15).
@@ -76,6 +77,17 @@ pub const LV99_GREEN: FloorAuraParams = FloorAuraParams {
     texture: "pikapika2.bmp",
     color_rgb: [0.14, 1.00, 0.14],
     radius: 15.0,
+    alpha_max: 200.0 / 255.0,
+};
+
+/// `Map_Pika("pikapika2.bmp")` — the faint sparkle floor under `EF_MAP_MAGICZONE`
+/// (#650). Two big ground quads (`distance = 46`) at a low `alphaB = 25`, blue
+/// tint (m_size 4). Reused by [`super::mapzone`].
+pub const MAP_PIKA: FloorAuraParams = FloorAuraParams {
+    texture: "pikapika2.bmp",
+    color_rgb: [0.39, 0.39, 1.00],
+    radius: 46.0,
+    alpha_max: 25.0 / 255.0,
 };
 
 pub const TEXTURES: &[&str] = &["pikapika2.bmp"];
@@ -105,7 +117,7 @@ impl Effect for FloorAuraEffect {
     fn collect_draws(&self, out: &mut EffectDrawList, _ctx: &EffectRenderCtx) {
         let [r, g, b] = self.params.color_rgb;
         let frame = self.age * FRAMES_PER_SECOND;
-        let alpha = ALPHA_MAX * (frame / FADE_IN_FRAMES).clamp(0.0, 1.0);
+        let alpha = self.params.alpha_max * (frame / FADE_IN_FRAMES).clamp(0.0, 1.0);
         if alpha <= 0.0 {
             return;
         }
