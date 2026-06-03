@@ -144,6 +144,12 @@ pub fn spr_def(id: EffectId) -> Option<SprDef> {
         EffectId::PokLove => SprDef::new("data/sprite/이팩트/폭죽_러브").one_shot(),
         EffectId::PokBirth => SprDef::new("data/sprite/이팩트/폭죽_생일").one_shot(),
         EffectId::PokChristmas => SprDef::new("data/sprite/이팩트/폭죽_크리스마스").one_shot(),
+        // Firework banners — `Effect_SPR(33/34)`, same setup as PokBirth above
+        // (`animSpeed = 4`, `m_repeatAnim = false`). The original game's roman
+        // sprite names (`white_day_fireworks` / `valentine_fireworks`) are the
+        // Korean `폭죽_<word>` resources in the classic GRF.
+        EffectId::PokWhite => SprDef::new("data/sprite/이팩트/폭죽_화이트데이").one_shot(),
+        EffectId::PokValen => SprDef::new("data/sprite/이팩트/폭죽_발렌타인").one_shot(),
         // Dragonsmoke is routed through `spr_burst_params` because the
         // original game's `DragonSmoke()` launches a `PP_3DPARTICLE`
         // with upward drift + per-frame yaw spin + fade-out at 2/3 of
@@ -171,6 +177,25 @@ pub fn spr_def(id: EffectId) -> Option<SprDef> {
         // client routes this id to the `setsudan` STR file instead, so
         // we follow that mapping (see `str_aliases.rs`) and leave SPR
         // routing out for this id.
+
+        // Monster effects — `Effect_SPR(7..13)`. Each launches one
+        // `PP_3DPARTICLE` billboard held until the duration. `animSpeed = 4`,
+        // `m_repeatAnim = false` except M04. M02 (`Effect_SPR(8)`) is *not*
+        // here — it's directional (see `effects/m_ef02.rs`).
+        // M01: `m_pattern = 0` (plain alpha blend, not the default
+        // PT_USEORGARGB), `m_alpha = 220`, `animSpeed = 3`. No blend field on
+        // `SprDef`, so the alpha folds into the tint.
+        EffectId::M01 => SprDef::new("data/sprite/이팩트/m_ef01")
+            .with_anim_speed(3.0)
+            .one_shot()
+            .with_tint([1.0, 1.0, 1.0, 220.0 / 255.0]),
+        EffectId::M03 => SprDef::new("data/sprite/이팩트/m_ef03").one_shot(),
+        // M04: the one looping member — Somatology-lab mob aura, repeats over
+        // its persistent duration (default `repeat = true` is correct).
+        EffectId::M04 => SprDef::new("data/sprite/이팩트/m_ef04"),
+        EffectId::M05 => SprDef::new("data/sprite/이팩트/m_ef05").one_shot(),
+        EffectId::M06 => SprDef::new("data/sprite/이팩트/m_ef06").one_shot(),
+        EffectId::M07 => SprDef::new("data/sprite/이팩트/m_ef07").one_shot(),
         _ => return None,
     })
 }

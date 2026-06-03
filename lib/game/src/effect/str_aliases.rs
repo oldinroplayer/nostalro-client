@@ -558,8 +558,9 @@ pub fn str_aliases(id: EffectId) -> &'static [&'static str] {
         EffectId::M05 => &["m05"],
         EffectId::M06 => &["m06"],
         EffectId::M07 => &["m07"],
-        EffectId::Kaizel => &["kaizel"],
-        EffectId::Kaahi => &["kaahi"],
+        // Kaizel routes to a Custom PP_SLASH1 effect (effects/slash.rs); Kaahi
+        // renders nothing in the original game (empty dispatch) → Noop. Neither
+        // has a `.str` file, so they must not derive a bogus STR alias.
         EffectId::Cloud6 => &["cloud6"],
         EffectId::Food01 => &["food_str"],
         EffectId::Food02 => &["food_int"],
