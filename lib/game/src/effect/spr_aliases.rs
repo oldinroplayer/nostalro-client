@@ -32,6 +32,10 @@ pub struct SprDef {
     pub tint: [f32; 4],
     /// Y-offset in world units (negative = upward). Mirrors `m_deltaPos2.y`.
     pub pos_y: f32,
+    /// ACT action index to play. Mirrors the original game's
+    /// `SetAction(F1, …)`: most SPR effects play action 0, but siblings that
+    /// share one sprite (e.g. Vallentine vs Vallentine2) differ only by action.
+    pub action: usize,
 }
 
 impl SprDef {
@@ -43,6 +47,7 @@ impl SprDef {
             repeat: true,
             tint: [1.0, 1.0, 1.0, 1.0],
             pos_y: 0.0,
+            action: 0,
         }
     }
     const fn with_size(mut self, size_scale: f32) -> Self {
@@ -65,6 +70,10 @@ impl SprDef {
         self.pos_y = pos_y;
         self
     }
+    const fn with_action(mut self, action: usize) -> Self {
+        self.action = action;
+        self
+    }
 }
 
 pub fn spr_def(id: EffectId) -> Option<SprDef> {
@@ -85,6 +94,15 @@ pub fn spr_def(id: EffectId) -> Option<SprDef> {
         // Vallentine(0): animSpeed=2, m_repeatAnim=false.
         EffectId::Vallentine => SprDef::new("data/sprite/이팩트/vallentine")
             .with_anim_speed(2.0)
+            .one_shot(),
+        // Vallentine2 is Vallentine(1): same sprite, ACT action 1.
+        EffectId::Vallentine2 => SprDef::new("data/sprite/이팩트/vallentine")
+            .with_anim_speed(2.0)
+            .one_shot()
+            .with_action(1),
+        // Itemfast is Vallentine(3): winged-boots sprite, animSpeed=4, one-shot.
+        EffectId::Itemfast => SprDef::new("data/sprite/이팩트/fast")
+            .with_anim_speed(4.0)
             .one_shot(),
         EffectId::Blessing => SprDef::new("data/sprite/이팩트/축복").one_shot(),
         // Demonstration: original game's `Demonstration()` calls
