@@ -7,7 +7,7 @@
 //! through to the default `20-ec` branch. So this effect is geometrically
 //! identical to BeginSpell, differing only in texture colour.
 
-use crate::effect::draw::{EffectDrawList, EffectStatus};
+use crate::effect::draw::{BlendKind, EffectDrawList, EffectStatus};
 use crate::effect::effect_trait::{Effect, EffectRenderCtx, EffectUpdateCtx};
 use crate::effect::effects::saint_casting::{
     SaintCastingConfig, SaintCastingEffect, TOTAL_DURATION_MS as SAINT_TOTAL_DURATION_MS,
@@ -18,10 +18,13 @@ pub const TEXTURES: &[&str] = &[TEXTURE];
 pub const TOTAL_DURATION_MS: u32 = SAINT_TOTAL_DURATION_MS;
 
 /// `SAINTCASTING` default-F1 size table: `max_height = 20 - ec`. Identical
-/// to BeginSpell (F1=1) — colour is the only difference.
+/// to BeginSpell (F1=1) — colour is the only difference. Default F1 maps to
+/// `m_size = 5` → untinted white, additive.
 const CONFIG: SaintCastingConfig = SaintCastingConfig {
     texture: TEXTURE,
     max_heights: [20.0, 19.0, 18.0, 17.0],
+    color_rgb: [1.0, 1.0, 1.0],
+    blend: BlendKind::Additive,
 };
 
 pub struct BeginSpell6Effect(SaintCastingEffect);

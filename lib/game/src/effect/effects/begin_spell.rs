@@ -14,7 +14,7 @@
 //! deltas, bell-shaped per-segment flame envelope) is shared with the rest
 //! of the `BeginSpell*` family and lives in [`super::saint_casting`].
 
-use crate::effect::draw::{EffectDrawList, EffectStatus};
+use crate::effect::draw::{BlendKind, EffectDrawList, EffectStatus};
 use crate::effect::effect_trait::{Effect, EffectRenderCtx, EffectUpdateCtx};
 use crate::effect::effects::saint_casting::{
     SaintCastingConfig, SaintCastingEffect, TOTAL_DURATION_MS as SAINT_TOTAL_DURATION_MS,
@@ -24,10 +24,13 @@ pub const TEXTURE: &str = "ring_yellow.tga";
 pub const TEXTURES: &[&str] = &[TEXTURE];
 pub const TOTAL_DURATION_MS: u32 = SAINT_TOTAL_DURATION_MS;
 
-/// dhxj `SAINTCASTING` F1=1 size table: `max_height = 20 - ec`.
+/// Original game `SAINTCASTING` F1=1 size table: `max_height = 20 - ec`.
+/// F1=1 maps to `m_size = 8` → (255,255,170) warm-yellow tint, additive.
 const CONFIG: SaintCastingConfig = SaintCastingConfig {
     texture: TEXTURE,
     max_heights: [20.0, 19.0, 18.0, 17.0],
+    color_rgb: [1.0, 1.0, 170.0 / 255.0],
+    blend: BlendKind::Additive,
 };
 
 pub struct BeginSpellEffect(SaintCastingEffect);
