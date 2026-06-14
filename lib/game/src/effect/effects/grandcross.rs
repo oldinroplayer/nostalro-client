@@ -210,6 +210,7 @@ impl Effect for GrandcrossEffect {
                         color: beam_color,
                         // Side faces are `PW=1` (alpha) in the original.
                         blend: BlendKind::Alpha,
+                        no_depth: false,
                     });
                 }
                 // Top cap is `PW=0` (additive) at half alpha in the original.
@@ -219,6 +220,7 @@ impl Effect for GrandcrossEffect {
                     texture: self.params.beam_texture,
                     color: beam_color_top,
                     blend: BlendKind::Additive,
+                    no_depth: false,
                 });
             }
         }

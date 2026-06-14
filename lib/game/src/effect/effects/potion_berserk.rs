@@ -199,6 +199,7 @@ impl PotionBerserkEffect {
             texture: SPARK_TEXTURE,
             color,
             blend: BlendKind::Alpha,
+            no_depth: false,
         });
 
         // Quad #2 — original game's vec[1] rotated by XRot(90): vertical
@@ -215,6 +216,7 @@ impl PotionBerserkEffect {
             texture: SPARK_TEXTURE,
             color,
             blend: BlendKind::Alpha,
+            no_depth: false,
         });
     }
 }
