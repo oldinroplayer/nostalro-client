@@ -314,6 +314,15 @@ pub fn make_effect(id: EffectId, anchor: EffectAnchor, hit_count: Option<u8>, ta
         EffectId::Hitbody => Box::new(effects::body_tint::BodyTintEffect::new(effects::body_tint::HITBODY)),
         EffectId::Falconassault => Box::new(effects::body_tint::BodyTintEffect::new(effects::body_tint::FALCONASSAULT)),
 
+        // Tint-flicker family — colour ↔ white every other frame + `BL_LIGHT_BODY`
+        // glow, most with a `BL_DOUBLE_BODY` halo. Shrink is a tint, not a resize.
+        EffectId::Chemicalbody => Box::new(effects::body_tint::BodyTintEffect::new(effects::body_tint::CHEMICALBODY)),
+        EffectId::Piercebody => Box::new(effects::body_tint::BodyTintEffect::new(effects::body_tint::PIERCEBODY)),
+        EffectId::Memorize => Box::new(effects::body_tint::BodyTintEffect::new(effects::body_tint::MEMORIZE)),
+        EffectId::Doublecastbody => Box::new(effects::body_tint::BodyTintEffect::new(effects::body_tint::DOUBLECASTBODY)),
+        EffectId::Greenbody => Box::new(effects::body_tint::BodyTintEffect::new(effects::body_tint::GREENBODY)),
+        EffectId::Shrink => Box::new(effects::body_tint::BodyTintEffect::new(effects::body_tint::SHRINK)),
+
         // Vertical body squares (`BL_PRESSED` squash / `BL_KICKED` lift) —
         // deform the actor sprite, no primitives.
         EffectId::Pressedbody => Box::new(effects::squarebody::SquareBodyEffect::pressed()),
